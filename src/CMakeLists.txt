@@ -11,6 +11,9 @@ SET(OPENALPR_MINOR_VERSION "3")
 SET(OPENALPR_PATCH_VERSION "0")
 SET(OPENALPR_VERSION ${OPENALPR_MAJOR_VERSION}.${OPENALPR_MINOR_VERSION}.${OPENALPR_PATCH_VERSION})
 
+SET(OpenCV_DIR "/app/.apt/usr/include/opencv2")
+SET(Tesseract_DIR "/app/.app/usr/include/tesseract")
+
 add_definitions( -DOPENALPR_MAJOR_VERSION=${OPENALPR_MAJOR_VERSION})
 add_definitions( -DOPENALPR_MINOR_VERSION=${OPENALPR_MINOR_VERSION})
 add_definitions( -DOPENALPR_PATCH_VERSION=${OPENALPR_PATCH_VERSION})
@@ -20,10 +23,10 @@ SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules/")
 add_definitions( -DINSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}")
 
 # TODO: switch to http://www.cmake.org/cmake/help/v2.8.5/cmake.html#module:GNUInstallDirs ?
-IF (NOT CMAKE_INSTALL_SYSCONFDIR) 
+IF (NOT CMAKE_INSTALL_SYSCONFDIR)
   SET(CMAKE_INSTALL_SYSCONFDIR "/etc")
 ENDIF()
-IF (NOT CMAKE_INSTALL_VARDIR) 
+IF (NOT CMAKE_INSTALL_VARDIR)
   SET(CMAKE_INSTALL_VARDIR "${CMAKE_INSTALL_PREFIX}/var")
 ENDIF()
 
@@ -50,7 +53,7 @@ ENDIF()
 if ( NOT DEFINED WITH_BINDING_C )
   SET(WITH_BINDING_C ON)
 ENDIF()
-          
+
 if ( NOT DEFINED WITH_BINDING_PYTHON )
   SET(WITH_BINDING_PYTHON ON)
 ENDIF()
@@ -63,17 +66,17 @@ if ( NOT DEFINED WITH_UTILITIES )
   SET(WITH_UTILITIES ON)
 ENDIF()
 
-IF (WIN32 AND WITH_DAEMON) 
+IF (WIN32 AND WITH_DAEMON)
   MESSAGE(WARNING "Skipping alprd daemon installation, as it is not supported in Windows.")
   SET(WITH_DAEMON OFF)
 ENDIF()
 
-IF (WIN32 AND WITH_TESTS) 
+IF (WIN32 AND WITH_TESTS)
   MESSAGE(WARNING "Skipping unit tests, as it is not supported in Windows.")
   SET(WITH_TESTS OFF)
 ENDIF()
 
-IF(Tesseract_FRAMEWORK_PATH AND Leptonica_FRAMEWORK_PATH) 
+IF(Tesseract_FRAMEWORK_PATH AND Leptonica_FRAMEWORK_PATH)
   MESSAGE(STATUS "Using Tesseract iOS framework: ${Tesseract_FRAMEWORK_PATH}")
   MESSAGE(STATUS "Using Leptonica iOS framework: ${Leptonica_FRAMEWORK_PATH}")
   # http://www.vtk.org/Wiki/CMake:HowToUseExistingOSXFrameworks
@@ -138,7 +141,7 @@ if (NOT IOS)
   ADD_EXECUTABLE( alpr  main.cpp )
 ENDIF()
 
-if (WIN32) 
+if (WIN32)
    SET(OPENALPR_LIB openalpr-static)
 ELSE()
    SET(OPENALPR_LIB openalpr)
@@ -167,11 +170,11 @@ ENDIF()
 
 # Compile the alprd library on Unix-based OS
 IF (WITH_DAEMON)
-  ADD_EXECUTABLE( alprd  
-    daemon.cpp 
-    daemon/daemonconfig.cpp 
-    daemon/beanstalk.c 
-    daemon/beanstalk.cc 
+  ADD_EXECUTABLE( alprd
+    daemon.cpp
+    daemon/daemonconfig.cpp
+    daemon/beanstalk.c
+    daemon/beanstalk.cc
 )
 
   FIND_PACKAGE( log4cplus REQUIRED )
@@ -186,28 +189,28 @@ IF (WITH_DAEMON)
 	  ${log4cplus_LIBRARIES}
       ${Extra_LIBS}
     )
-	
+
 ENDIF()
 
 if(WITH_UTILITIES)
 add_subdirectory(misc_utilities)
 ENDIF()
 
-if (WITH_TESTS)  
+if (WITH_TESTS)
 add_subdirectory(tests)
 ENDIF()
 
 add_subdirectory(openalpr)
 add_subdirectory(video)
 
-if (WITH_BINDING_JAVA) 
+if (WITH_BINDING_JAVA)
 add_subdirectory(bindings/java)
 ENDIF()
 
 if (WITH_BINDING_PYTHON)
 add_subdirectory(bindings/python)
 ENDIF()
-        
+
 if (WITH_BINDING_C)
 add_subdirectory(bindings/c)
 ENDIF()
